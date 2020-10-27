@@ -1,4 +1,5 @@
 module Task
+  use omp_lib
   implicit none
   contains
 
@@ -13,6 +14,7 @@ module Task
     m = size(A, dim=1)
     n = size(A, dim=2)
 
+    !$omp parallel shared(A, x1 y1, x2, y2, n, max_sum) private(L, R, Up, Down, current_column, current_sum)
     allocate(current_column(m))
 
     x1=1
@@ -42,6 +44,7 @@ module Task
     end do
 
     deallocate(current_column)
+    !$omp end parallel
   end subroutine
 
   subroutine FindMaxInArray(A, Summ, Up, Down)
