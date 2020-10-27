@@ -18,6 +18,11 @@ module Task
     ! здесь нужно указать, какие переменные будут разделяться между потоками
     ! (доступ к одной области памяти), а для каких поток будет создавать копию.
     ! (shared и private, соответстсвенно)
+    ! Shared  - A, x1 y1, x2, y2, n, max_sum
+    ! Private - L, R, Up, Down, current_column, current_sum
+    ! Значение private переменных требует инициализации, поэтому начало до allocate(current_column(m))
+    ! Значение массива А, например, сохраняется при выходе из пар.региона.
+    !$omp parallel shared(A, x1 y1, x2, y2, n, max_sum) private(L, R, Up, Down, current_column, current_sum)
     allocate(current_column(m))
 
     x1=1
