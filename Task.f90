@@ -1,4 +1,5 @@
 module Task
+  use omp_lib
   implicit none
   contains
 
@@ -13,6 +14,10 @@ module Task
     m = size(A, dim=1)
     n = size(A, dim=2)
 
+    !ПАРАЛЛЕЛЬНЫЙ РЕГИОН
+    ! здесь нужно указать, какие переменные будут разделяться между потоками
+    ! (доступ к одной области памяти), а для каких поток будет создавать копию.
+    ! (shared и private, соответстсвенно)
     allocate(current_column(m))
 
     x1=1
@@ -21,7 +26,7 @@ module Task
     y2=1
     max_sum = A(1,1)
 
-    do L = 1, n
+    do L = 1, n   ! НАЧАЛО: распределение итераций цикла do по потокам
       current_column = A(:, L)
 
       do R = L, n
@@ -39,9 +44,9 @@ module Task
           y2 = R
         endif
       end do
-    end do
-
+    end do          ! КОНЕЦ: все потоки завершаются, кроме основного
     deallocate(current_column)
+    ! КОНЕЦ ПАРАЛЛЕЛЬНОГО РЕГИОНА
   end subroutine
 
   subroutine FindMaxInArray(A, Summ, Up, Down)
