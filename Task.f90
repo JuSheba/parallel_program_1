@@ -28,19 +28,21 @@ module Task
       current_column = A(:, L)
 
       do R = L, n
-        if (R &gt; L) then
+        if (R > L) then
           current_column = current_column + A(:, R)
         endif
 
         call FindMaxInArray(current_column, current_sum, Up, Down)
 
-        if (current_sum &gt; max_sum) then
+        !$omp critical
+        if (current_sum > max_sum) then
           max_sum = current_sum
           x1 = Up
           x2 = Down
           y1 = L
           y2 = R
         endif
+        !$omp end critical
       end do
     end do
     !$omp end do
@@ -64,13 +66,13 @@ module Task
 
     do i=1, size(A)
       cur_sum = cur_sum + A(i)
-      if (cur_sum &gt; Summ) then
+      if (cur_sum > Summ) then
         Summ = cur_sum
         Up = minus_pos + 1
         Down = i
       endif
 
-      if (cur_sum &lt; 0) then
+      if (cur_sum < 0) then
         cur_sum = 0
         minus_pos = i
       endif
