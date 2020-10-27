@@ -23,6 +23,7 @@ module Task
     y2=1
     max_sum = A(1,1)
 
+    !$omp do schedule(dynamic)
     do L = 1, n
       current_column = A(:, L)
 
@@ -42,7 +43,7 @@ module Task
         endif
       end do
     end do
-
+    !$omp end do
     deallocate(current_column)
     !$omp end parallel
   end subroutine
