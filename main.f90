@@ -9,7 +9,7 @@ program main
   allocate(A(1337, 1337))
 
   call random_number(A)
-  A = 2*A - 1d0
+  A = 2d0 * A - 1d0
 
   call omp_set_num_threads(2)
   time1 = omp_get_wtime()
