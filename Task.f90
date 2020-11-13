@@ -14,7 +14,7 @@ module Task
     m = size(A, dim=1)
     n = size(A, dim=2)
 
-    !$omp parallel shared(A, x1 y1, x2, y2, n, max_sum) private(L, R, Up, Down, current_column, current_sum)
+    !$omp parallel shared(m, A, x1, y1, x2, y2, n, max_sum) private(L, R, Up, Down, current_column, current_sum)
     allocate(current_column(m))
 
     x1=1
