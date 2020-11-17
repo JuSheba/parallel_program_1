@@ -7,21 +7,38 @@ module Task
     implicit none
     real(8), intent(in), dimension(:,:) :: A
     integer(4), intent(out) :: x1, y1, x2, y2
-    integer(4) :: n, L, R, Up, Down, m, tmp
+    integer(4) :: n, L, R, Up, Down, m, tmp, num_all_threads, thread_num
     real(8), allocatable :: current_column(:)
+    real(8), allocatable :: max_sum_threads(:)
     real(8) :: current_sum, max_sum
+    integer(4), allocatable :: coords_threads(:), num_max(:)
 
     m = size(A, dim=1)
     n = size(A, dim=2)
-
-    !$omp parallel shared(m, A, x1, y1, x2, y2, n, max_sum) private(L, R, Up, Down, current_column, current_sum)
-    allocate(current_column(m))
 
     x1=1
     y1=1
     x2=1
     y2=1
     max_sum = A(1,1)
+
+    allocate(current_column(m))
+
+    !$omp  parallel shared(m, x1, y1, x2, y2, A, n, max_sum, coords_threads,&
+    !$omp& num_all_threads, max_sum_threads, num_max)
+    !$omp& private(L, R, Up, Down, current_column, current_sum, thread_num)
+
+    !$omp single
+    num_all_threads = omp_get_num_threads()
+
+    allocate(num_max(1), max_sum_threads(num_all_threads), &
+             coords_threads(4*num_all_threads))
+
+    coords_threads = 1
+    max_sum_threads = 1
+    write(*,*) 'stop this plz'
+	  !$omp end single
+
 
     !$omp do schedule(dynamic)
     do L = 1, n
@@ -34,20 +51,30 @@ module Task
 
         call FindMaxInArray(current_column, current_sum, Up, Down)
 
-        !$omp critical
-        if (current_sum > max_sum) then
-          max_sum = current_sum
-          x1 = Up
-          x2 = Down
-          y1 = L
-          y2 = R
+        thread_num = omp_get_thread_num()
+        if (current_sum > max_sum_threads(thread_num)) then
+          max_sum_threads(thread_num) = current_sum
+          coords_threads(thread_num)  = Up
+          coords_threads(thread_num + 1*num_all_threads) = Down
+          coords_threads(thread_num + 2*num_all_threads) = L
+          coords_threads(thread_num + 3*num_all_threads) = R
         endif
-        !$omp end critical
       end do
     end do
     !$omp end do
-    deallocate(current_column)
     !$omp end parallel
+
+    num_max = maxloc(max_sum_threads)
+    max_sum = max_sum_threads(num_max(1))
+    x1 = coords_threads(num_max(1))
+    x2 = coords_threads(num_max(1) + 1*num_all_threads)
+    y1 = coords_threads(num_max(1) + 2*num_all_threads)
+    y2 = coords_threads(num_max(1) + 3*num_all_threads)
+
+    deallocate(current_column)
+    deallocate(max_sum_threads)
+    deallocate(coords_threads)
+
   end subroutine
 
   subroutine FindMaxInArray(A, Summ, Up, Down)
