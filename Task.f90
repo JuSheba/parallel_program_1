@@ -25,7 +25,7 @@ module Task
     allocate(current_column(m))
 
     !$omp  parallel shared(m, x1, y1, x2, y2, A, n, max_sum, coords_threads,&
-    !$omp& num_all_threads, max_sum_threads, num_max)
+    !$omp& num_all_threads, max_sum_threads, num_max)&
     !$omp& private(L, R, Up, Down, current_column, current_sum, thread_num)
 
     !$omp single
@@ -36,10 +36,9 @@ module Task
 
     coords_threads = 1
     max_sum_threads = 1
-    write(*,*) 'stop this plz'
-	  !$omp end single
+    !$omp end single
 
-
+    thread_num = omp_get_thread_num()
     !$omp do schedule(dynamic)
     do L = 1, n
       current_column = A(:, L)
@@ -51,7 +50,6 @@ module Task
 
         call FindMaxInArray(current_column, current_sum, Up, Down)
 
-        thread_num = omp_get_thread_num()
         if (current_sum > max_sum_threads(thread_num)) then
           max_sum_threads(thread_num) = current_sum
           coords_threads(thread_num)  = Up
