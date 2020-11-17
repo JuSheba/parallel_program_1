@@ -31,8 +31,8 @@ module Task
     !$omp single
     num_all_threads = omp_get_num_threads()
 
-    allocate(num_max(1), max_sum_threads(num_all_threads), &
-             coords_threads(4*num_all_threads))
+    allocate(max_sum_threads(0:num_all_threads-1), &
+             coords_threads(0:4*num_all_threads-1))
 
     coords_threads = 1
     max_sum_threads = 1
@@ -64,7 +64,7 @@ module Task
 
     num_max = maxloc(max_sum_threads)
     max_sum = max_sum_threads(num_max(1))
-    x1 = coords_threads(num_max(1))
+    x1 = coords_threads(num_max(1) + 0*num_all_threads)
     x2 = coords_threads(num_max(1) + 1*num_all_threads)
     y1 = coords_threads(num_max(1) + 2*num_all_threads)
     y2 = coords_threads(num_max(1) + 3*num_all_threads)
