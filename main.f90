@@ -9,14 +9,17 @@ program main
   integer, dimension(33) :: seed = (/ 73, 48, 53, 56, 75, 34, 96, 28, 17,  6,  2,&
                                       59, 26, 60, 40, 57, 69,  6, 60, 22,  2, 83,&
                                       89, 84,  9, 15, 32, 65, 20, 59, 61, 24, 73 /)
-  allocate(A(1337, 1337))
+  allocate(A(2, 2))
 
-  call random_seed(put=seed)
+!  call random_seed(put=seed)
 
-  call random_number(A)
-  A = 2d0 * A - 1d0
+!  call random_number(A)
+!  A = 2d0 * A - 1d0
 
-  call omp_set_num_threads(1)
+  A(1,1) = -1d0; A(1,2) = -1d0; A(2,1) = -1d0; A(2,2) = 0d0;
+
+
+  call omp_set_num_threads(50)
   time1 = omp_get_wtime()
   call GetMaxCoordinates(A, x1, y1, x2, y2)
   time2 = omp_get_wtime()
