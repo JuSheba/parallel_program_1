@@ -35,7 +35,7 @@ module Task
              coords_threads(0:4*num_all_threads-1))
 
     coords_threads = 1
-    max_sum_threads = 1
+    max_sum_threads = A(1,1)
     !$omp end single
 
     thread_num = omp_get_thread_num()
@@ -51,8 +51,8 @@ module Task
         call FindMaxInArray(current_column, current_sum, Up, Down)
 
         if (current_sum > max_sum_threads(thread_num)) then
-          max_sum_threads(thread_num) = current_sum
-          coords_threads(thread_num)  = Up
+        !  max_sum_threads(thread_num) = current_sum
+          coords_threads(thread_num + 0*num_all_threads)  = Up
           coords_threads(thread_num + 1*num_all_threads) = Down
           coords_threads(thread_num + 2*num_all_threads) = L
           coords_threads(thread_num + 3*num_all_threads) = R
@@ -61,6 +61,8 @@ module Task
     end do
     !$omp end do
     !$omp end parallel
+
+    write(*,*) coords_threads
 
     num_max = maxloc(max_sum_threads)
     max_sum = max_sum_threads(num_max(1))
