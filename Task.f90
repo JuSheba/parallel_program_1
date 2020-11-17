@@ -71,9 +71,7 @@ module Task
     y1 = coords_threads(num_max(1) + 2*num_all_threads)
     y2 = coords_threads(num_max(1) + 3*num_all_threads)
 
-    deallocate(current_column)
-    deallocate(max_sum_threads)
-    deallocate(coords_threads)
+    deallocate(current_column, max_sum_threads, coords_threads)
 
   end subroutine
 
